@@ -1,0 +1,114 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inHello
+  labels:
+    app: inHello
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inHello
+  template:
+    metadata:
+      labels:
+        app: inHello
+    spec:
+      containers:
+        - name: inHello
+          image: username/inHello:latest
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: '/actuator/health'
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: '/actuator/health'
+              port: 8080
+            initialDelaySeconds: 120
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 5
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: outHello
+  labels:
+    app: outHello
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: outHello
+  template:
+    metadata:
+      labels:
+        app: outHello
+    spec:
+      containers:
+        - name: outHello
+          image: username/outHello:latest
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: '/actuator/health'
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: '/actuator/health'
+              port: 8080
+            initialDelaySeconds: 120
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 5
+
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: inHello
+  labels:
+    app: inHello
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: inHello
+
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: outHello
+  labels:
+    app: outHello
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: outHello
+
